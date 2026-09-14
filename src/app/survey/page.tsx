@@ -46,6 +46,15 @@ function SurveyContent() {
     return '레드 라이트';
   };
 
+  const handlePrev = () => {
+    if (isSubmitting) return;
+    if (currentIndex > 0) {
+      setCurrentIndex(prev => prev - 1);
+    } else {
+      router.push('/');
+    }
+  };
+
   const calculateAndFinish = async (finalAnswers: Record<number, number>) => {
     setIsSubmitting(true);
     let totalScore = 0;
@@ -147,6 +156,19 @@ function SurveyContent() {
                 {opt.label}
               </button>
             ))}
+          </div>
+
+          <div className="mt-10 pt-6 border-t border-gray-100 flex justify-start">
+            <button
+              onClick={handlePrev}
+              disabled={isSubmitting}
+              className="text-gray-500 hover:text-gray-700 font-bold text-lg flex items-center transition-colors disabled:opacity-50"
+            >
+              <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+              {currentIndex === 0 ? '이전 화면으로' : '이전 문항으로'}
+            </button>
           </div>
         </div>
       </div>

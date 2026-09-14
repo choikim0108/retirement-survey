@@ -36,7 +36,7 @@ export const plans: Record<'plan1' | 'plan2', SurveyPlan> = {
     title: '영역별 심층 노후준비 진단 (가중치 적용)',
     questions: [
       // 재무 영역 (가중치 8, 총 40점)
-      { id: 1, area: '재무', text: '귀하가 현재 가입 중인 연금은 무엇입니까?', options: createOptions('3종 이상', '1종만 보유', '없음'), weight: 8 },
+      { id: 1, area: '재무', text: '귀하가 현재 가입 중인 연금은 무엇입니까?', options: createOptions('3종 이상(국민+개인+주택연금 등)', '1종만 보유(국민연금 등 1종)', '없음'), weight: 8 },
       { id: 2, area: '재무', text: '퇴직 후 예상되는 월 총소득은 얼마입니까?', options: createOptions('250만원 이상', '150~250만원 미만', '150만원 미만'), weight: 8 },
       { id: 3, area: '재무', text: '은퇴 후 예상되는 월 필수 생활비를 가늠하고 있습니까?', options: createOptions('구체적 금액 파악', '대략적 파악', '전혀 못함'), weight: 8 },
       { id: 4, area: '재무', text: '비상시(질병, 사고 등) 즉시 사용할 수 있는 예비 자금이 있습니까?', options: createOptions('3개월분 이상', '1~2개월분', '거의 없음'), weight: 8 },
@@ -51,7 +51,7 @@ export const plans: Record<'plan1' | 'plan2', SurveyPlan> = {
       { id: 9, area: '여가', text: '은퇴 후 소득 창출을 위해 재취업이나 창업을 희망하십니까?', options: createOptions('희망', '생계형 희망', '희망하지 않음'), weight: 3.75 },
       { id: 10, area: '여가', text: '본인이 가진 전문 기술이나 경험을 나눌 의향이 있습니까?', options: createOptions('적극 참여 희망', '기회 시 참여', '관심 없음'), weight: 3.75 },
       { id: 11, area: '여가', text: '하루 3시간 이상 몰입할 수 있는 취미가 있습니까?', options: createOptions('명확히 있다', '찾는 중이다', '없음'), weight: 3.75 },
-      { id: 12, area: '여가', text: '춘천시 내 평생학습 정보나 시니어 아카데미를 알고 계십니까?', options: createOptions('참여 중', '정보 필요', '전혀 모름'), weight: 3.75 },
+      { id: 12, area: '여가', text: '춘천시 내 평생학습 정보나 미래동행 아카데미를 알고 계십니까?', options: createOptions('참여 중', '정보 필요', '전혀 모름'), weight: 3.75 },
       
       // 대인관계 영역 (가중치 5, 총 15점)
       { id: 13, area: '대인관계', text: '고민을 나눌 수 있는 배우자나 친구가 있습니까?', options: createOptions('충분히 있다', '1~2명 정도 있다', '거의 없다'), weight: 5 },
