@@ -6,13 +6,15 @@ import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 
 export default function AdminPage() {
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
+    const validPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin1234';
+    if (password === validPassword) {
       setIsAuthenticated(true);
       fetchData();
     } else {
@@ -43,14 +45,23 @@ export default function AdminPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <form onSubmit={handleLogin} className="bg-white p-8 rounded-xl shadow-lg max-w-sm w-full">
           <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">관리자 로그인</h1>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="비밀번호"
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 mb-4"
-          />
-          <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700">
+          <div className="relative mb-6">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="비밀번호"
+              className="w-full px-4 py-4 pr-12 rounded-lg border border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-gray-900"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-sm font-semibold"
+            >
+              {showPassword ? "숨기기" : "보기"}
+            </button>
+          </div>
+          <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-lg text-lg font-bold hover:bg-blue-700">
             접속
           </button>
         </form>

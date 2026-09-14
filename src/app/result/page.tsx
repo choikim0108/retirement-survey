@@ -55,19 +55,19 @@ function ResultContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center space-y-6">
-        <h1 className="text-3xl font-bold text-gray-800">진단 결과</h1>
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-10 text-center space-y-6">
+        <h1 className="text-4xl font-extrabold text-gray-900">진단 결과</h1>
         
         <div className="py-8">
-          <div className="text-6xl font-black text-blue-600 mb-4">{score}점</div>
-          <h2 className={`text-2xl font-bold mb-4 ${colorClass}`}>{grade}</h2>
-          <p className="text-gray-600 text-lg leading-relaxed">{message}</p>
+          <div className="text-7xl font-black text-blue-600 mb-6">{score}점</div>
+          <h2 className={`text-3xl font-bold mb-6 ${colorClass}`}>{grade}</h2>
+          <p className="text-gray-800 text-xl font-medium leading-relaxed break-keep">{message}</p>
         </div>
 
-        <div className="pt-6 border-t border-gray-100">
+        <div className="pt-6 border-t border-gray-200">
           <Link 
             href="/"
-            className="block w-full py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors"
+            className="block w-full py-5 bg-blue-600 text-white rounded-2xl font-bold text-xl hover:bg-blue-700 transition-colors shadow-sm"
           >
             처음으로 돌아가기
           </Link>
