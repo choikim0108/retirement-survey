@@ -19,14 +19,28 @@ export default function Home() {
   };
 
   const startSurvey = (planId: string) => {
-    if (!userInfo.name || !userInfo.phone || !userInfo.ageGroup) {
-      setError('개인정보를 모두 입력해주세요.');
+    if (!userInfo.name.trim()) {
+      setError('이름을 정확히 입력해주세요.');
+      return;
+    }
+    if (userInfo.name.trim().length < 2) {
+      setError('이름은 2글자 이상 입력해주세요.');
+      return;
+    }
+    if (!userInfo.phone.trim() || userInfo.phone.trim().length < 9) {
+      setError('연락처를 정확히 입력해주세요. (예: 010-1234-5678 또는 01012345678)');
+      return;
+    }
+    if (!userInfo.ageGroup) {
+      setError('연령대를 선택해주세요.');
       return;
     }
     if (!consent) {
       setError('개인정보 수집 및 이용에 동의해주세요.');
       return;
     }
+    
+    setError('');
 
     // Save to sessionStorage
     sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
