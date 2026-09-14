@@ -12,38 +12,57 @@ export default function Home() {
     ageGroup: ''
   });
   const [consent, setConsent] = useState(false);
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState<string[]>([]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setUserInfo({ ...userInfo, [e.target.name]: e.target.value });
   };
 
   const startSurvey = (planId: string) => {
-    if (!userInfo.name.trim()) {
-      setError('이름을 정확히 입력해주세요.');
-      return;
+    const newErrors: string[] = [];
+    const nameStr = userInfo.name.trim();
+    
+    // 이름 검증
+    if (!nameStr) {
+      newErrors.push('이름을 입력해주세요.');
+    } else if (nameStr.length < 2) {
+      newErrors.push('이름은 2글자 이상 입력해주세요.');
+    } else if (!/^[가-힣a-zA-Z\s]+$/.test(nameStr)) {
+      newErrors.push('이름에는 한글과 영문만 사용할 수 있습니다.');
     }
-    if (userInfo.name.trim().length < 2) {
-      setError('이름은 2글자 이상 입력해주세요.');
-      return;
+
+    // 연락처 검증
+    const cleanedPhone = userInfo.phone.replace(/[^0-9]/g, '');
+    if (!cleanedPhone) {
+      newErrors.push('연락처를 입력해주세요.');
+    } else if (cleanedPhone.startsWith('010') && cleanedPhone.length !== 11) {
+      newErrors.push(`010 휴대폰 번호는 11자리여야 합니다. (현재 ${cleanedPhone.length}자리)`);
+    } else if (cleanedPhone.length < 9 || cleanedPhone.length > 11) {
+      newErrors.push('연락처 번호 길이가 올바르지 않습니다.');
     }
-    if (!userInfo.phone.trim() || userInfo.phone.trim().length < 9) {
-      setError('연락처를 정확히 입력해주세요. (예: 010-1234-5678 또는 01012345678)');
-      return;
-    }
+
+    // 연령대 검증
     if (!userInfo.ageGroup) {
-      setError('연령대를 선택해주세요.');
-      return;
+      newErrors.push('연령대를 선택해주세요.');
     }
+
+    // 동의 검증
     if (!consent) {
-      setError('개인정보 수집 및 이용에 동의해주세요.');
+      newErrors.push('개인정보 수집 및 이용에 동의해주세요.');
+    }
+    
+    if (newErrors.length > 0) {
+      setErrors(newErrors);
       return;
     }
     
-    setError('');
+    setErrors([]);
 
     // Save to sessionStorage
-    sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+    sessionStorage.setItem('userInfo', JSON.stringify({
+      ...userInfo,
+      phone: cleanedPhone // 숫자만 저장하도록 정제
+    }));
     
     router.push(`/survey?plan=${planId}`);
   };
@@ -99,7 +118,15 @@ export default function Home() {
             </label>
           </div>
 
-          {error && <p className="text-red-600 text-base text-center font-bold">{error}</p>}
+          {errors.length > 0 && (
+            <div className="bg-red-50 border border-red-200 p-4 rounded-xl space-y-1">
+              {errors.map((err, idx) => (
+                <p key={idx} className="text-red-600 text-base font-bold text-center">
+                  • {err}
+                </p>
+              ))}
+            </div>
+          )}
 
           <div className="space-y-4 pt-4">
             <button
