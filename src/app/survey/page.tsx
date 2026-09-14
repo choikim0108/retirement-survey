@@ -29,9 +29,13 @@ function SurveyContent() {
     setAnswers(newAnswers);
 
     if (currentIndex < plan.questions.length - 1) {
-      setTimeout(() => setCurrentIndex(prev => prev + 1), 200); // 부드러운 전환을 위한 약간의 딜레이
+      setTimeout(() => setCurrentIndex(prev => prev + 1), 200);
     } else {
-      calculateAndFinish(newAnswers);
+      // Previous
+      // calculateAndFinish(newAnswers);
+      
+      // >> Updated
+      setTimeout(() => calculateAndFinish(newAnswers), 200);
     }
   };
 
@@ -39,19 +43,22 @@ function SurveyContent() {
     let totalScore = 0;
     
     if (planId === 'plan1') {
-      // 1안: (총 획득 점수 / 만점(8*5=40)) * 100
       const sum = Object.values(finalAnswers).reduce((a, b) => a + b, 0);
       const maxPossible = plan.questions.length * 5;
       totalScore = (sum / maxPossible) * 100;
     } else {
-      // 2안: 각 문항별 획득점수 비율에 가중치를 곱함 = (선택점수/5) * 가중치
       plan.questions.forEach((q) => {
         const score = finalAnswers[q.id] || 0;
         totalScore += (score / 5) * q.weight;
       });
     }
 
-    router.push(`/result?score=${Math.round(totalScore)}`);
+    // Previous
+    // router.push(`/result?score=${Math.round(totalScore)}`);
+    
+    // >> Updated
+    const finalScore = Math.round(totalScore);
+    router.push(`/result?score=${finalScore}`);
   };
 
   return (
@@ -86,6 +93,12 @@ function SurveyContent() {
             {currentQuestion.options.map((opt, idx) => (
               <button
                 key={idx}
+                // Previous
+                // onClick={() => handleSelect(opt.score)}
+                // className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-gray-700"
+                
+                // >> Updated
+                type="button" 
                 onClick={() => handleSelect(opt.score)}
                 className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-gray-700"
               >
