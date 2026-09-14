@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { plans } from '@/data/surveyData';
 import { PlanType } from '@/types';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, getDocs, query, where } from 'firebase/firestore';
 
 function SurveyContent() {
   const router = useRouter();
@@ -72,8 +72,21 @@ function SurveyContent() {
       const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null;
 
       if (userInfo) {
+        let finalNickname = userInfo.name;
+        
+        // 닉네임 중복 체크
+        const q = query(collection(db, 'survey_results'), where('name', '==', finalNickname));
+        const snapshot = await getDocs(q);
+        
+        if (!snapshot.empty) {
+          // 중복 시 뒤에 랜덤 4자리 숫자 부여 (예: 홍길동#1234)
+          const randomTag = Math.floor(1000 + Math.random() * 9000);
+          finalNickname = `${finalNickname}#${randomTag}`;
+        }
+
         await addDoc(collection(db, 'survey_results'), {
           ...userInfo,
+          name: finalNickname, // 중복 처리된 닉네임으로 덮어쓰기
           planId,
           score: finalScore,
           grade,

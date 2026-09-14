@@ -22,14 +22,10 @@ export default function Home() {
     const newErrors: string[] = [];
     const nameStr = userInfo.name.trim();
     
-    // 이름 검증
+    // 닉네임 검증
     if (!nameStr) {
-      newErrors.push('이름을 입력해주세요.');
-    } else if (nameStr.length < 2) {
-      newErrors.push('이름은 2글자 이상 입력해주세요.');
-    } else if (!/^[가-힣a-zA-Z\s]+$/.test(nameStr)) {
-      newErrors.push('이름에는 한글과 영문만 사용할 수 있습니다.');
-    }
+      newErrors.push('닉네임을 입력해주세요.');
+    } // 1자 이상이면 패스되도록 다른 제약(정규식, 길이) 삭제
 
     // 연락처 검증
     const cleanedPhone = userInfo.phone.replace(/[^0-9]/g, '');
@@ -81,7 +77,7 @@ export default function Home() {
             <input 
               type="text" 
               name="name"
-              placeholder="이름"
+              placeholder="닉네임"
               value={userInfo.name}
               onChange={handleInputChange}
               className="w-full px-5 py-4 rounded-xl border border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-gray-900 placeholder-gray-500 font-medium bg-white"

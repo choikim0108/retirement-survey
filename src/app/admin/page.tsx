@@ -226,7 +226,7 @@ export default function AdminPage() {
               <table className="min-w-full text-sm text-left text-gray-500">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3">이름</th>
+                    <th className="px-6 py-3">닉네임</th>
                     <th className="px-6 py-3">연락처</th>
                     <th className="px-6 py-3">연령대</th>
                     <th className="px-6 py-3">진단 유형</th>
