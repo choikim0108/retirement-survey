@@ -1,25 +1,35 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 function ResultContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const scoreParam = searchParams.get('score');
+  const [score, setScore] = useState<number | null>(null);
   
   useEffect(() => {
-    if (!scoreParam) {
+    const resultStr = sessionStorage.getItem('surveyResult');
+    if (!resultStr) {
+      router.replace('/');
+      return;
+    }
+    
+    try {
+      const result = JSON.parse(resultStr);
+      if (typeof result.score === 'number') {
+        setScore(result.score);
+      } else {
+        router.replace('/');
+      }
+    } catch (e) {
       router.replace('/');
     }
-  }, [scoreParam, router]);
+  }, [router]);
 
-  if (!scoreParam) {
-    return null;
+  if (score === null) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
-
-  const score = parseInt(scoreParam, 10);
   
   let grade = '';
   let message = '';

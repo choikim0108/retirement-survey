@@ -4,6 +4,8 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { plans } from '@/data/surveyData';
 import { PlanType } from '@/types';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 function SurveyContent() {
   const router = useRouter();
@@ -13,8 +15,8 @@ function SurveyContent() {
   const plan = plans[planId];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // plan이 없으면 홈으로 리다이렉트
   useEffect(() => {
     if (!plan) router.replace('/');
   }, [plan, router]);
@@ -25,21 +27,27 @@ function SurveyContent() {
   const progress = ((currentIndex) / plan.questions.length) * 100;
 
   const handleSelect = (score: number) => {
+    if (isSubmitting) return;
+
     const newAnswers = { ...answers, [currentQuestion.id]: score };
     setAnswers(newAnswers);
 
     if (currentIndex < plan.questions.length - 1) {
       setTimeout(() => setCurrentIndex(prev => prev + 1), 200);
     } else {
-      // Previous
-      // calculateAndFinish(newAnswers);
-      
-      // >> Updated
       setTimeout(() => calculateAndFinish(newAnswers), 200);
     }
   };
 
-  const calculateAndFinish = (finalAnswers: Record<number, number>) => {
+  const getGrade = (score: number) => {
+    if (score >= 80) return '골든 시니어';
+    if (score >= 60) return '실버 로드';
+    if (score >= 40) return '옐로 라이트';
+    return '레드 라이트';
+  };
+
+  const calculateAndFinish = async (finalAnswers: Record<number, number>) => {
+    setIsSubmitting(true);
     let totalScore = 0;
     
     if (planId === 'plan1') {
@@ -53,12 +61,31 @@ function SurveyContent() {
       });
     }
 
-    // Previous
-    // router.push(`/result?score=${Math.round(totalScore)}`);
-    
-    // >> Updated
     const finalScore = Math.round(totalScore);
-    router.push(`/result?score=${finalScore}`);
+    const grade = getGrade(finalScore);
+
+    // Save to sessionStorage for result page
+    sessionStorage.setItem('surveyResult', JSON.stringify({ score: finalScore, grade }));
+
+    try {
+      const userInfoStr = sessionStorage.getItem('userInfo');
+      const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null;
+
+      if (userInfo) {
+        await addDoc(collection(db, 'survey_results'), {
+          ...userInfo,
+          planId,
+          score: finalScore,
+          grade,
+          answers: finalAnswers,
+          createdAt: serverTimestamp()
+        });
+      }
+    } catch (e) {
+      console.error('Error saving document: ', e);
+    } finally {
+      router.push('/result');
+    }
   };
 
   return (
@@ -79,7 +106,13 @@ function SurveyContent() {
         </div>
 
         {/* Question Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+        <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 relative">
+          {isSubmitting && (
+            <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-2xl z-10">
+              <p className="text-gray-600 font-medium">결과를 분석 중입니다...</p>
+            </div>
+          )}
+          
           {currentQuestion.area && (
             <span className="inline-block px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-bold mb-4">
               {currentQuestion.area}
@@ -93,14 +126,10 @@ function SurveyContent() {
             {currentQuestion.options.map((opt, idx) => (
               <button
                 key={idx}
-                // Previous
-                // onClick={() => handleSelect(opt.score)}
-                // className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-gray-700"
-                
-                // >> Updated
                 type="button" 
                 onClick={() => handleSelect(opt.score)}
-                className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-gray-700"
+                disabled={isSubmitting}
+                className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-gray-700 disabled:opacity-50"
               >
                 {opt.label}
               </button>
