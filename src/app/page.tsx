@@ -8,7 +8,6 @@ export default function Home() {
   const router = useRouter();
   const [userInfo, setUserInfo] = useState({
     name: '',
-    phone: '',
     ageGroup: ''
   });
   const [consent, setConsent] = useState(false);
@@ -25,17 +24,7 @@ export default function Home() {
     // 닉네임 검증
     if (!nameStr) {
       newErrors.push('닉네임을 입력해주세요.');
-    } // 1자 이상이면 패스되도록 다른 제약(정규식, 길이) 삭제
-
-    // 연락처 검증
-    const cleanedPhone = userInfo.phone.replace(/[^0-9]/g, '');
-    if (!cleanedPhone) {
-      newErrors.push('연락처를 입력해주세요.');
-    } else if (cleanedPhone.startsWith('010') && cleanedPhone.length !== 11) {
-      newErrors.push(`010 휴대폰 번호는 11자리여야 합니다. (현재 ${cleanedPhone.length}자리)`);
-    } else if (cleanedPhone.length < 9 || cleanedPhone.length > 11) {
-      newErrors.push('연락처 번호 길이가 올바르지 않습니다.');
-    }
+    } // 1자 이상이면 패스
 
     // 연령대 검증
     if (!userInfo.ageGroup) {
@@ -55,10 +44,7 @@ export default function Home() {
     setErrors([]);
 
     // Save to sessionStorage
-    sessionStorage.setItem('userInfo', JSON.stringify({
-      ...userInfo,
-      phone: cleanedPhone // 숫자만 저장하도록 정제
-    }));
+    sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
     
     router.push(`/survey?plan=${planId}`);
   };
@@ -79,14 +65,6 @@ export default function Home() {
               name="name"
               placeholder="닉네임"
               value={userInfo.name}
-              onChange={handleInputChange}
-              className="w-full px-5 py-4 rounded-xl border border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-gray-900 placeholder-gray-500 font-medium bg-white"
-            />
-            <input 
-              type="tel" 
-              name="phone"
-              placeholder="연락처 (예: 010-1234-5678)"
-              value={userInfo.phone}
               onChange={handleInputChange}
               className="w-full px-5 py-4 rounded-xl border border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-gray-900 placeholder-gray-500 font-medium bg-white"
             />

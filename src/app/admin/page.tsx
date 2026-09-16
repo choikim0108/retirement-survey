@@ -108,12 +108,41 @@ export default function AdminPage() {
     return acc;
   }, {} as Record<string, Record<string, { sum: number, count: number }>>);
 
+  const exportToExcel = () => {
+    const headers = ['닉네임', '연령대', '진단 유형', '총점', '등급', '응답일시'];
+    const rows = data.map(item => [
+      item.name || '',
+      item.ageGroup || '',
+      item.planId === 'plan1' ? '1안' : '2안',
+      item.score || 0,
+      item.grade || '',
+      item.createdAt?.toDate ? item.createdAt.toDate().toLocaleString() : '-'
+    ]);
+
+    const csvContent = '\uFEFF' + [
+      headers.join(','),
+      ...rows.map(r => r.join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `노후준비진단_결과_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm">
           <h1 className="text-2xl font-bold text-gray-800">관리자 대시보드</h1>
-          <button onClick={() => fetchData()} className="text-blue-600 hover:underline">새로고침</button>
+          <div className="space-x-4">
+            <button onClick={exportToExcel} className="text-green-600 font-bold hover:underline">엑셀 내보내기</button>
+            <button onClick={() => fetchData()} className="text-blue-600 hover:underline">새로고침</button>
+          </div>
         </div>
 
         {loading ? (
@@ -227,7 +256,6 @@ export default function AdminPage() {
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                   <tr>
                     <th className="px-6 py-3">닉네임</th>
-                    <th className="px-6 py-3">연락처</th>
                     <th className="px-6 py-3">연령대</th>
                     <th className="px-6 py-3">진단 유형</th>
                     <th className="px-6 py-3">총점</th>
@@ -239,7 +267,6 @@ export default function AdminPage() {
                   {data.map(item => (
                     <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
                       <td className="px-6 py-4 font-medium text-gray-900">{item.name}</td>
-                      <td className="px-6 py-4">{item.phone}</td>
                       <td className="px-6 py-4">{item.ageGroup}</td>
                       <td className="px-6 py-4">{item.planId === 'plan1' ? '1안' : '2안'}</td>
                       <td className="px-6 py-4">{item.score}</td>
@@ -255,7 +282,7 @@ export default function AdminPage() {
                   ))}
                   {data.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="px-6 py-4 text-center text-gray-400">응답 데이터가 없습니다.</td>
+                      <td colSpan={6} className="px-6 py-4 text-center text-gray-400">응답 데이터가 없습니다.</td>
                     </tr>
                   )}
                 </tbody>
