@@ -171,6 +171,11 @@ function SurveyContent() {
             </button>
           </div>
         </div>
+
+        {/* 춘천미래동행재단 로고 */}
+        <div className="mt-12 flex justify-center pb-8">
+          <img src="/logo.png" alt="춘천미래동행재단" className="h-10 object-contain opacity-80" />
+        </div>
       </div>
     </div>
   );

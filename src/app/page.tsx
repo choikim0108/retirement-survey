@@ -119,6 +119,11 @@ export default function Home() {
         </div>
       </div>
       
+      {/* 춘천미래동행재단 로고 */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
+        <img src="/logo.png" alt="춘천미래동행재단" className="h-10 object-contain opacity-80" />
+      </div>
+
       {/* 관리자 페이지 진입 버튼 */}
       <Link 
         href="/admin"

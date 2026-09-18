@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { plans } from '@/data/surveyData';
 
 export default function AdminPage() {
   const [password, setPassword] = useState('');
@@ -108,6 +109,30 @@ export default function AdminPage() {
     return acc;
   }, {} as Record<string, Record<string, { sum: number, count: number }>>);
 
+  // --- 추가된 유의미한 통계 ---
+  // 1. 연령대별 평균 총점 (어느 연령대가 가장 노후 준비가 취약한지 파악)
+  const ageScoreStats = data.reduce((acc, curr) => {
+    const age = curr.ageGroup || '미상';
+    if (!acc[age]) acc[age] = { sum: 0, count: 0 };
+    acc[age].sum += curr.score;
+    acc[age].count += 1;
+    return acc;
+  }, {} as Record<string, { sum: number, count: number }>);
+
+  // 2. 2안(심층 진단) 영역별 달성률 (재무, 건강, 여가, 대인관계 중 어느 영역이 가장 취약한지 파악)
+  // 각 영역의 획득 점수 합산 / 각 영역의 만점 합산
+  const categoryStats = data.filter(d => d.planId === 'plan2' && d.answers).reduce((acc, curr) => {
+    plans.plan2.questions.forEach(q => {
+      if (!q.area) return;
+      if (!acc[q.area]) acc[q.area] = { earned: 0, max: 0 };
+      
+      const earnedScore = curr.answers[q.id] || 0;
+      acc[q.area].earned += (earnedScore / 5) * (q.weight || 1);
+      acc[q.area].max += (q.weight || 1); // 5점 만점 기준 환산 전 가중치 최대치
+    });
+    return acc;
+  }, {} as Record<string, { earned: number, max: number }>);
+
   const exportToExcel = () => {
     const headers = ['닉네임', '연령대', '진단 유형', '총점', '등급', '응답일시'];
     const rows = data.map(item => [
@@ -210,6 +235,54 @@ export default function AdminPage() {
                         </div>
                         <div className="w-full bg-gray-100 rounded-full h-2">
                           <div className="bg-indigo-500 h-2 rounded-full" style={{ width: `${percent}%` }}></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* 연령대별 평균 점수 */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-lg font-bold text-gray-800 mb-2">연령대별 평균 노후준비 점수</h3>
+                <p className="text-sm text-gray-500 mb-6">어느 연령대가 가장 노후 준비에 취약한지 파악할 수 있습니다.</p>
+                <div className="space-y-4">
+                  {['39세 이하', '40~49세', '50~59세', '60~64세', '65세 이상'].map(age => {
+                    const stat = ageScoreStats[age];
+                    const avg = stat ? Math.round(stat.sum / stat.count) : 0;
+                    return (
+                      <div key={age}>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="font-medium text-gray-700">{age}</span>
+                          <span className="text-gray-500 font-bold">{avg}점</span>
+                        </div>
+                        <div className="w-full bg-gray-100 rounded-full h-2">
+                          <div className="bg-amber-500 h-2 rounded-full" style={{ width: `${avg}%` }}></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 2안 심층 진단 - 영역별 준비도 */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-lg font-bold text-gray-800 mb-2">영역별 평균 준비도 (심층 진단)</h3>
+                <p className="text-sm text-gray-500 mb-6">시민들이 어떤 분야(재무/건강 등)에 가장 취약한지 보여줍니다.</p>
+                <div className="space-y-4">
+                  {['재무', '건강', '여가', '대인관계'].map(area => {
+                    const stat = categoryStats[area];
+                    const percent = stat && stat.max > 0 ? Math.round((stat.earned / stat.max) * 100) : 0;
+                    return (
+                      <div key={area}>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="font-medium text-gray-700">{area} 영역</span>
+                          <span className="text-gray-500 font-bold">{percent}% 준비됨</span>
+                        </div>
+                        <div className="w-full bg-gray-100 rounded-full h-2">
+                          <div className="bg-emerald-500 h-2 rounded-full" style={{ width: `${percent}%` }}></div>
                         </div>
                       </div>
                     );
