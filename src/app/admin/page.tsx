@@ -298,24 +298,34 @@ export default function AdminPage() {
                 <div>
                   <h4 className="font-semibold text-gray-600 mb-4 pb-2 border-b">1안 (간편 진단)</h4>
                   <div className="space-y-2 text-sm text-gray-600">
-                    {qStats['plan1'] && Object.entries(qStats['plan1']).sort(([a], [b]) => Number(a) - Number(b)).map(([qId, stat]: [string, any]) => (
-                      <div key={qId} className="flex justify-between">
-                        <span>Q{qId}</span>
-                        <span className="font-medium">{(stat.sum / stat.count).toFixed(2)}점</span>
-                      </div>
-                    ))}
+                    {qStats['plan1'] && Object.entries(qStats['plan1']).sort(([a], [b]) => Number(a) - Number(b)).map(([qId, stat]: [string, any]) => {
+                      const qText = plans.plan1.questions.find(q => q.id === Number(qId))?.text || '';
+                      return (
+                        <div key={qId} className="flex justify-between items-center py-1 border-b border-gray-50 last:border-0">
+                          <span className="truncate w-4/5 pr-4 text-gray-700" title={qText}>
+                            Q{qId}. {qText}
+                          </span>
+                          <span className="font-bold text-gray-900 whitespace-nowrap">{(stat.sum / stat.count).toFixed(2)}점</span>
+                        </div>
+                      );
+                    })}
                     {!qStats['plan1'] && <p className="text-gray-400">데이터 없음</p>}
                   </div>
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-600 mb-4 pb-2 border-b">2안 (심층 진단)</h4>
                   <div className="space-y-2 text-sm text-gray-600">
-                    {qStats['plan2'] && Object.entries(qStats['plan2']).sort(([a], [b]) => Number(a) - Number(b)).map(([qId, stat]: [string, any]) => (
-                      <div key={qId} className="flex justify-between">
-                        <span>Q{qId}</span>
-                        <span className="font-medium">{(stat.sum / stat.count).toFixed(2)}점</span>
-                      </div>
-                    ))}
+                    {qStats['plan2'] && Object.entries(qStats['plan2']).sort(([a], [b]) => Number(a) - Number(b)).map(([qId, stat]: [string, any]) => {
+                      const qText = plans.plan2.questions.find(q => q.id === Number(qId))?.text || '';
+                      return (
+                        <div key={qId} className="flex justify-between items-center py-1 border-b border-gray-50 last:border-0">
+                          <span className="truncate w-4/5 pr-4 text-gray-700" title={qText}>
+                            Q{qId}. {qText}
+                          </span>
+                          <span className="font-bold text-gray-900 whitespace-nowrap">{(stat.sum / stat.count).toFixed(2)}점</span>
+                        </div>
+                      );
+                    })}
                     {!qStats['plan2'] && <p className="text-gray-400">데이터 없음</p>}
                   </div>
                 </div>
