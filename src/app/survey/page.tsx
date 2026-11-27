@@ -10,9 +10,7 @@ import { collection, addDoc, serverTimestamp, getDocs, query, where } from 'fire
 function SurveyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const rawPlanId = (searchParams.get('plan') as PlanType) || 'plan1';
-  // 2안 임시 비활성화: plan2로 접근 시 plan1으로 처리
-  const planId: PlanType = rawPlanId === 'plan2' ? 'plan1' : rawPlanId;
+  const planId = (searchParams.get('plan') as PlanType) || 'plan1';
   
   const plan = plans[planId];
   const [currentIndex, setCurrentIndex] = useState(0);

@@ -109,14 +109,12 @@ export default function Home() {
             >
               [1안] 간편 진단 (8문항) 시작
             </button>
-            {/* 2안 비활성화 (코드 보존)
             <button
               onClick={() => startSurvey('plan2')}
               className="w-full py-5 px-6 bg-indigo-50 text-indigo-800 hover:bg-indigo-100 rounded-2xl font-bold text-xl transition-colors duration-200 border border-indigo-200 shadow-sm"
             >
               [2안] 심층 진단 (15문항) 시작
             </button>
-            */}
           </div>
         </div>
       </div>
